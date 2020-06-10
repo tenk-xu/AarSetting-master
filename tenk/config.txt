@@ -1,0 +1,4 @@
+{
+    "AndroidManifest": "{\"${FACEBOOK_APP_ID}\":\"123abcd\"}",
+    "strings": "{\"facebook_app_id\":\"234abcd\",\"fb_login_protocol_scheme\":\"234abcd\"}"
+}
