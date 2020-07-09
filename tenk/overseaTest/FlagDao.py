@@ -9,6 +9,18 @@ class flagProvider():
         self.__filename = filename
         print('filename', self.__filename)
 
+    #获取节点
+    def getNodeByName(self,tag,attr,name):
+        tree = xmlProvider.openXml(self.__filename)
+        if tree is None:
+            return None
+        # nodes = xmlProvider.find_nodes(tree, './' + tag)
+        nodes = xmlProvider.find_node(tree, tag)
+        nodes = xmlProvider.get_node_by_keyvalue(nodes, {attr:name})
+        if len(nodes) > 0:
+            return nodes[0]
+        return None
+
     #获取节点属性
     def getValueByName(self,node,name):
         tree = xmlProvider.openXml(self.__filename)
@@ -40,7 +52,7 @@ class flagProvider():
         xmlProvider.saveAs(tree, self.__filename)
 
     #删除节点
-    def deleteTagByName(self,name):
+    def deleteTagByName(self,tag,attr,name):
         tree = xmlProvider.openXml(self.__filename)
-        xmlProvider.del_node_by_tagkeyvalue([tree.getroot()], 'flag', {'name':name})
+        xmlProvider.del_node_by_tagkeyvalue([tree.getroot()], tag, {attr:name})
         xmlProvider.saveAs(tree, self.__filename)

@@ -59,14 +59,36 @@ def zip(zip_path, target):
     writeAllFileToZip(zip_path, zipFile, zip_path)  # 开始压缩。
     print("压缩成功")
 
+# 删除配置
+def deleteConfig(config,unzip_file):
+    if "AndroidManifest" in config.keys():
+        ret_dic = json.loads(config["AndroidManifest"])
+        for cNode in ret_dic:
+            deleteXML(unzip_file+"/AndroidManifest.xml",cNode)
+        print("AndroidManifest刪除成功")
+    if "values" in config.keys():
+        ret_dic = json.loads(config["values"])
+        for cNode in ret_dic:
+            deleteXML(unzip_file + "/res/values/values.xml", cNode)
+        print("values刪除成功")
+
+def deleteXML(file_xml, ret_dic):
+    stringExist = {}
+    flagDao = flagProvider(file_xml)
+    item = ret_dic.split("-")
+    if (flagDao.getNodeByName(item[0], item[1], item[2]) is not None):
+        flagDao.deleteTagByName(item[0], item[1], item[2])
+        stringExist[item[2]] = True
+        print("deleteTagByName", item[0], item[1], item[2])
+
 # 替换配置
 def replaceConfig(config,unzip_file):
     if "AndroidManifest" in config.keys():
         ret_dic = json.loads(config["AndroidManifest"])
         replaceParams(unzip_file+"/AndroidManifest.xml",ret_dic)
         print("AndroidManifest替换成功")
-    if "strings" in config.keys():
-        ret_dic = json.loads(config["strings"])
+    if "values" in config.keys():
+        ret_dic = json.loads(config["values"])
         updateXML(unzip_file + "/res/values/values.xml", ret_dic)
         print("strings替换成功")
 
@@ -122,7 +144,18 @@ def main(sourcePath, config):
     replaceConfig(ret_dic, os.path.join(path, "oversea_file"))
     zip(os.path.join(path, "oversea_file"), os.path.join(path, "OVERSEA.aar"))
 
+def deletes(sourcePath, config):
+    ret_dic = json.loads(config)
+    print("config.txt", ret_dic, sep="\n")
+    (path, filename) = os.path.split(sourcePath)
+    print("sourcePath", path, filename, sep="->")
+    un_zip(sourcePath, os.path.join(path, "oversea_file"))
+    deleteConfig(ret_dic, os.path.join(path, "oversea_file"))
+    zip(os.path.join(path, "oversea_file"), os.path.join(path, "OVERSEA.aar"))
+
 if __name__ == '__main__':
     # sourcePath = input()
-    config = "{\n" + "    \"AndroidManifest\": \"{\\\"${FACEBOOK_APP_ID}\\\":\\\"123abcd\\\"}\",\n" + "    \"strings\": \"{\\\"facebook_app_id\\\":\\\"234abcd\\\",\\\"fb_login_protocol_scheme\\\":\\\"234abcd\\\"}\"\n" +"}"
-    main("D:/python/AarSetting-master/tenk/OVERSEA-1.1.0_2.aar", config)
+    # config = "{\n" + "    \"AndroidManifest\": \"{\\\"${FACEBOOK_APP_ID}\\\":\\\"123abcd\\\"}\",\n" + "    \"values\": \"{\\\"facebook_app_id\\\":\\\"234abcd\\\",\\\"fb_login_protocol_scheme\\\":\\\"234abcd\\\"}\"\n" +"}"
+    # main("D:/python/AarSetting-master/tenk/OVERSEA-1.1.0_2.aar", config)
+    config = "{\n      \"AndroidManifest\": \"[\\\"provider-{http://schemas.android.com/apk/res/android}name-com.facebook.FacebookContentProvider\\\"]\",\n    \"values\": \"[\\\"string-name-facebook_app_id\\\", \\\"string-name-fb_login_protocol_scheme\\\"]\"\n}\n"
+    deletes("D:/python/AarSetting-master/tenk/OVERSEA-1.1.0_2.aar", config)

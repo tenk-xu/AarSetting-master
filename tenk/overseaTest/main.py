@@ -13,6 +13,13 @@ def trans():
     print(config)
     transPackage.main(srcPath, config)
 
+def deletes():
+    srcPath = init_data_Text.get(1.0, END).strip().replace("\n", "")
+    print(srcPath)
+    config = config_data_Text.get(1.0, END).strip().replace("\n", "")
+    print(config)
+    transPackage.deletes(srcPath, config)
+
 root = Tk()  # 创建窗口对象的背景色
 #窗口名
 root.title("oversea-tool-v1.0")
@@ -32,8 +39,12 @@ config_data_Text = Text(root, width=60)  # 替换文本录入框
 config_data_Text.grid(row=4, column=0, rowspan=6)
 
 # 按钮
-str_trans_to_md5_button = Button(root, text="替换", bg="lightyellow", width=10, command=trans)  # 调用内部方法  加()为直接调用
-str_trans_to_md5_button.grid(row=10, column=0)
+trans_settings_button = Button(root, text="替换", bg="lightyellow", width=10, command=trans)  # 调用内部方法  加()为直接调用
+trans_settings_button.grid(row=10, column=0)
+
+# 删除按钮
+delete_settings_button = Button(root, text="删除配置", bg="lightyellow", width=10, command=deletes)  # 调用内部方法  加()为直接调用
+delete_settings_button.grid(row=11, column=0)
 
 root.mainloop()  # 进入消息循环
 

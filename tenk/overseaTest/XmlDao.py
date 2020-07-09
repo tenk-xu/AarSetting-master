@@ -1,6 +1,7 @@
 #!usr/bin/env python
 #coding:utf-8
 from xml.etree.ElementTree import ElementTree,Element
+import xml.etree.ElementTree as ET
 
 class xmlProvider():
     @staticmethod
@@ -12,6 +13,7 @@ class xmlProvider():
     @staticmethod
     def saveAs(tree,outfile):
         print(outfile)
+        ET.register_namespace('android', 'http://schemas.android.com/apk/res/android')
         # indent(tree.getroot())
         xmlProvider.pretty_xml(tree.getroot(), '\t', '\n')  # 执行美化方法
         tree.write(outfile, encoding="utf-8",xml_declaration=True)
@@ -70,6 +72,9 @@ class xmlProvider():
             for child in children:
                 if child.tag == tag and xmlProvider.if_match(child, kv_map):
                     parent_node.remove(child)
+                elif(child.getchildren()):
+                    xmlProvider.del_node_by_tagkeyvalue([child], tag, kv_map)
+
     @staticmethod
     def create_node(tag, property_map, content=''):
         '''新造一个节点
@@ -134,3 +139,26 @@ class xmlProvider():
             if node.get(key) != kv_map.get(key):
                 return False
         return True
+
+    # 遍历所有的节点
+    def walkData(root_node, level, result_list):
+        global unique_id
+        result_list.append(root_node)
+
+        # 遍历每个子节点
+        children_node = root_node.getchildren()
+        if len(children_node) == 0:
+            return
+        for child in children_node:
+            xmlProvider.walkData(child, level + 1, result_list)
+        return
+
+    @staticmethod
+    def find_node(tree, tag):
+        list = []
+        resultList = []
+        xmlProvider.walkData(tree.getroot(), 1, list)
+        for node in list:
+            if(node.tag == tag):
+                resultList.append(node)
+        return resultList
